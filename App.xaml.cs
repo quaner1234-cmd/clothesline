@@ -25,7 +25,27 @@ public partial class App : Application
         Directory.CreateDirectory(ScreenshotsDir);
 
         Logger.Init(Path.Combine(DataDir, "log.txt"));
-        Logger.Log("startup, screenshots dir: " + ScreenshotsDir);
+
+        AppSettings settings;
+        try
+        {
+            settings = AppSettings.Load(DataDir, ScreenshotsDir);
+        }
+        catch (Exception ex)
+        {
+            Logger.Log("settings.json: " + ex);
+            MessageBox.Show(
+                "无法读取 settings.json，Clothesline 已退出，以免用默认值覆盖现有设置。\n\n"
+                + AppSettings.FilePath(DataDir) + "\n\n" + ex.Message,
+                "Clothesline",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown();
+            return;
+        }
+
+        var hotkey = HotkeyChord.FromSettings(settings);
+        Logger.Log($"startup, maxPegs={settings.MaxPegs}, clipboard={settings.ClipboardWatchEnabled}, folders={settings.WatchFolders.Count}, hotkey={hotkey.Label}");
 
         DispatcherUnhandledException += (_, args) =>
         {
@@ -33,13 +53,17 @@ public partial class App : Application
             args.Handled = true; // 常驻小工具，宁可吞掉单次异常也别弹窗卡死
         };
 
-        var win = new LineWindow();
-        win.Show(); // ShowActivated=False + WS_EX_NOACTIVATE，不会抢焦点
+        var win = new LineWindow(settings);
 
         // --save-demo <路径>：挂两张合成图，把绳子窗口渲染成 PNG 后退出（生成 README 演示图用）
-        if (e.Args is { Length: 2 } demo && demo[0] == "--save-demo")
+        bool demo = e.Args is { Length: 2 } demoArgs && demoArgs[0] == "--save-demo";
+        if (demo) win.PrepareDemo();
+
+        win.Show(); // ShowActivated=False + WS_EX_NOACTIVATE，不会抢焦点
+
+        if (demo)
         {
-            win.StartDemo(demo[1]);
+            win.StartDemo(e.Args[1]);
             return;
         }
 

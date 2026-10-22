@@ -1,0 +1,101 @@
+<Window x:Class="Clothesline.PinWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="贴图"
+        Width="460" Height="360"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        WindowStartupLocation="Manual"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <DropShadowEffect x:Key="GlassShadow" BlurRadius="18" ShadowDepth="1" Opacity="0.16" Color="#241C1C1C"/>
+        <DropShadowEffect x:Key="GlassShadowHover" BlurRadius="28" ShadowDepth="4" Opacity="0.28" Color="#3A1C1C1C"/>
+        <Style x:Key="GlassButton" TargetType="Button">
+            <Setter Property="Foreground" Value="#2C343A"/>
+            <Setter Property="Background" Value="#E6FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#D5DEE5"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="9" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="#FFFFFF"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#B7C3CC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="14">
+        <Border CornerRadius="16" BorderThickness="1" Padding="10">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="#C9F7F4EF"/>
+                    <Setter Property="BorderBrush" Value="#F2FFFFFF"/>
+                    <Setter Property="Effect" Value="{StaticResource GlassShadow}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Effect" Value="{StaticResource GlassShadowHover}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <DockPanel x:Name="Toolbar" LastChildFill="False" Margin="0,0,0,8">
+                    <Button DockPanel.Dock="Right" Content="关闭" Style="{StaticResource GlassButton}" Margin="6,0,0,0" Click="Close_Click"/>
+                    <Button DockPanel.Dock="Right" Content="识别文字" Style="{StaticResource GlassButton}" Margin="6,0,0,0" Click="Ocr_Click"/>
+                    <CheckBox x:Name="ThroughBox" Content="穿透" Foreground="#3E474E" VerticalAlignment="Center" Margin="12,0,0,0"
+                              Checked="Through_Changed" Unchecked="Through_Changed"/>
+                    <CheckBox x:Name="LockBox" Content="锁定" Foreground="#3E474E" VerticalAlignment="Center"
+                              Checked="Lock_Changed" Unchecked="Lock_Changed"/>
+                </DockPanel>
+                <Grid Grid.Row="1">
+                    <Image x:Name="Photo" Stretch="Uniform" Cursor="SizeAll"
+                           MouseLeftButtonDown="Photo_MouseDown"
+                           PreviewMouseWheel="Photo_MouseWheel"/>
+                    <Thumb x:Name="Sizer" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                           Margin="0,0,2,2" Cursor="SizeNWSE" DragDelta="Sizer_Drag">
+                        <Thumb.Template>
+                            <ControlTemplate TargetType="Thumb">
+                                <Border CornerRadius="5" BorderThickness="1">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#F7F9FB" Offset="0"/>
+                                            <GradientStop Color="#C5CED6" Offset="0.55"/>
+                                            <GradientStop Color="#9AA4AD" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Border.BorderBrush>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#FFFFFF" Offset="0"/>
+                                            <GradientStop Color="#7E888F" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.BorderBrush>
+                                </Border>
+                            </ControlTemplate>
+                        </Thumb.Template>
+                    </Thumb>
+                </Grid>
+                <TextBlock x:Name="Status" Grid.Row="2" Margin="2,8,0,0" FontSize="12" Foreground="#5C656C"
+                           TextWrapping="Wrap"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

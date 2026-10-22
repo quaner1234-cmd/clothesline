@@ -1,0 +1,32 @@
+<Window x:Class="Clothesline.HistoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Clothesline 历史"
+        Width="520" Height="460"
+        MinWidth="420" MinHeight="320"
+        WindowStartupLocation="CenterScreen"
+        Background="#F7F4EE"
+        FontFamily="Segoe UI"
+        FontSize="13"
+        Topmost="True">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="取下但未删除的截图。可以重新挂上绳子，或再开一张贴图。"
+                   TextWrapping="Wrap" Foreground="#4A4438" Margin="0,0,0,10"/>
+        <ListBox x:Name="Items" Grid.Row="1" BorderBrush="#D9D0BF" Background="White"
+                 DisplayMemberPath="Display"/>
+        <TextBlock x:Name="EmptyText" Grid.Row="1" Text="还没有取下过的截图。"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#8A8175"/>
+        <TextBlock x:Name="Status" Grid.Row="2" Margin="0,8,0,8" Foreground="#9C3B2E" TextWrapping="Wrap"/>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="重新挂上" Padding="12,4" Margin="0,0,8,0" Click="Rehang_Click"/>
+            <Button Content="贴图" Padding="12,4" Margin="0,0,8,0" Click="Pin_Click"/>
+            <Button Content="从历史移除" Padding="12,4" Click="Forget_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,91 @@
+<Window x:Class="Clothesline.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Clothesline 设置"
+        Width="500" Height="680"
+        MinWidth="460" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Background="#F7F4EE"
+        FontFamily="Segoe UI"
+        FontSize="13"
+        Topmost="True">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="晾衣绳" FontSize="18" FontWeight="SemiBold" Foreground="#4A4438"/>
+            <DockPanel Margin="0,12,0,0">
+                <TextBlock Text="最多挂件数" VerticalAlignment="Center" Foreground="#4A4438"/>
+                <TextBox x:Name="MaxPegsBox" Width="88" HorizontalAlignment="Right" Padding="6,4"/>
+            </DockPanel>
+            <TextBlock Text="默认 20，范围 1–200。超出窗口宽度时用滚轮横向滚动。"
+                       Margin="0,6,0,0" Foreground="#8A8175" FontSize="12" TextWrapping="Wrap"/>
+            <DockPanel Margin="0,10,0,0">
+                <TextBlock Text="历史条数" VerticalAlignment="Center" Foreground="#4A4438"/>
+                <TextBox x:Name="HistoryBox" Width="88" HorizontalAlignment="Right" Padding="6,4"/>
+            </DockPanel>
+            <TextBlock Text="默认 50，范围 1–500。取下且不删除文件时记入历史，可再挂上或贴图。"
+                       Margin="0,6,0,0" Foreground="#8A8175" FontSize="12" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,0,0,16">
+            <TextBlock Text="剪贴板" FontSize="18" FontWeight="SemiBold" Foreground="#4A4438"/>
+            <CheckBox x:Name="ClipboardBox" Content="监听剪贴板（Win+Shift+S 等）" Margin="0,10,0,0" Foreground="#4A4438"/>
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="最小宽度（像素）" Foreground="#4A4438"/>
+                    <TextBox x:Name="MinWidthBox" Margin="0,4,0,0" Padding="6,4"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="最小高度（像素）" Foreground="#4A4438"/>
+                    <TextBox x:Name="MinHeightBox" Margin="0,4,0,0" Padding="6,4"/>
+                </StackPanel>
+            </Grid>
+            <TextBlock Text="0 表示不限制。小于该尺寸的剪贴板图片不会挂上绳子。"
+                       Margin="0,6,0,0" Foreground="#8A8175" FontSize="12" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Margin="0,0,0,16">
+            <TextBlock Text="热键" FontSize="18" FontWeight="SemiBold" Foreground="#4A4438"/>
+            <TextBox x:Name="HotkeyBox" Margin="0,10,0,0" Padding="6,6" IsReadOnly="True"
+                     PreviewKeyDown="HotkeyBox_PreviewKeyDown"/>
+            <TextBlock Text="在框里按下组合键。至少要有 Ctrl、Alt、Shift 或 Win 之一。被占用时会回退到 Ctrl+Alt+L，仍不行则 Ctrl+Alt+T，并在托盘提示。"
+                       Margin="0,6,0,0" Foreground="#8A8175" FontSize="12" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <DockPanel Grid.Row="3" Margin="0,0,0,12">
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                <TextBlock Text="监视文件夹" FontSize="18" FontWeight="SemiBold" Foreground="#4A4438" VerticalAlignment="Center"/>
+            </DockPanel>
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                <Button Content="添加文件夹" Padding="12,4" Margin="0,0,8,0" Click="AddFolder_Click"/>
+                <Button Content="移除" Padding="12,4" Click="RemoveFolder_Click"/>
+            </StackPanel>
+            <ListBox x:Name="FolderList" BorderBrush="#D9D0BF" Background="White"/>
+        </DockPanel>
+
+        <TextBlock x:Name="ErrorText" Grid.Row="4" Foreground="#9C3B2E" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+        <DockPanel Grid.Row="5">
+            <TextBlock VerticalAlignment="Center" Foreground="#8A8175" FontSize="12"
+                       Text="保存在 %LOCALAPPDATA%\Clothesline\settings.json"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="保存" Padding="16,5" Margin="0,0,8,0" IsDefault="True" Click="Save_Click"/>
+                <Button Content="取消" Padding="16,5" IsCancel="True"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

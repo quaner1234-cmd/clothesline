@@ -2,24 +2,27 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Clothesline</RootNamespace>
     <AssemblyName>Clothesline</AssemblyName>
-    <Version>0.1.0</Version>
+    <Version>0.5.2</Version>
     <Product>Clothesline</Product>
     <Description>A screenshot clothesline for Windows: every capture hangs on a line at the top of your screen. Inspired by tendedero.</Description>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- probe/ 是独立的透明度探针小程序，不参与主项目编译 -->
+    <!-- probe/ 是独立的透明度探针小程序，不参与主项目编译。tests/ 是不依赖 WPF 的逻辑断言。 -->
     <Compile Remove="probe\**" />
+    <Compile Remove="tests\**" />
     <Page Remove="probe\**" />
+    <Page Remove="tests\**" />
     <ApplicationDefinition Remove="probe\**" />
     <None Remove="probe\**" />
+    <None Remove="tests\**" />
   </ItemGroup>
 
 </Project>

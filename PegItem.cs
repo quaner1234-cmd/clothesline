@@ -12,7 +12,27 @@ public sealed class PegItem : INotifyPropertyChanged
 
     public RotateTransform Rot { get; }
     public ScaleTransform Scale { get; }
+    public TranslateTransform Hang { get; }
     public TransformGroup Xf { get; }
+
+    private double _zoom = PegZoom.Default;
+
+    /// <summary>相对基准尺寸的缩放。悬停的轻微放大仍走 Scale，不改这里。</summary>
+    public double Zoom
+    {
+        get => _zoom;
+        set
+        {
+            double next = PegZoom.Next(value, 0);
+            if (Math.Abs(_zoom - next) < 1e-9) return;
+            _zoom = next;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ThumbWidth)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ThumbHeight)));
+        }
+    }
+
+    public double ThumbWidth => PegZoom.BaseWidth * _zoom;
+    public double ThumbHeight => PegZoom.BaseHeight * _zoom;
 
     private bool _copyFeedback;
     public bool CopyFeedback
@@ -33,9 +53,11 @@ public sealed class PegItem : INotifyPropertyChanged
         Angle = angle;
         Rot = new RotateTransform(angle);
         Scale = new ScaleTransform(1, 1);
+        Hang = new TranslateTransform();
         Xf = new TransformGroup();
         Xf.Children.Add(Rot);
         Xf.Children.Add(Scale);
+        Xf.Children.Add(Hang);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

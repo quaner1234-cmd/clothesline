@@ -73,3 +73,51 @@ public sealed class FolderWatcher : IDisposable
         _timer.Dispose();
     }
 }
+
+/// <summary>同时监视多个文件夹。某个路径建不起来只跳过该路径，不影响其余。</summary>
+public sealed class FolderWatchSet : IDisposable
+{
+    private readonly List<FolderWatcher> _watchers = new();
+    private Action<string>? _onFound;
+
+    public void SetHandler(Action<string> onFound) => _onFound = onFound;
+
+    public void Replace(IEnumerable<string> folders)
+    {
+        foreach (var watcher in _watchers) watcher.Dispose();
+        _watchers.Clear();
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var raw in folders)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) continue;
+            string full;
+            try
+            {
+                full = Path.GetFullPath(raw.Trim());
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("watch path: " + ex.Message);
+                continue;
+            }
+            if (!seen.Add(full)) continue;
+            try
+            {
+                var watcher = new FolderWatcher(full);
+                watcher.CaptureFound = _onFound;
+                _watchers.Add(watcher);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("watch skip " + full + ": " + ex.Message);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        foreach (var watcher in _watchers) watcher.Dispose();
+        _watchers.Clear();
+    }
+}

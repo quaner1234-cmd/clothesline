@@ -2,11 +2,12 @@ using System.Runtime.InteropServices;
 
 namespace Clothesline;
 
-/// <summary>手写 Shell_NotifyIcon 托盘图标，零 NuGet 依赖。图标在代码里逐像素画（绳子 + 木夹）。</summary>
+/// <summary>手写 Shell_NotifyIcon 托盘图标，零 NuGet 依赖。图标在代码里逐像素画（灰绳 + 铝夹）。</summary>
 internal sealed class TrayIcon : IDisposable
 {
-    private const uint NIM_ADD = 0, NIM_DELETE = 2;
-    private const uint NIF_MESSAGE = 1, NIF_ICON = 2, NIF_TIP = 4;
+    private const uint NIM_ADD = 0, NIM_MODIFY = 1, NIM_DELETE = 2;
+    private const uint NIF_MESSAGE = 1, NIF_ICON = 2, NIF_TIP = 4, NIF_INFO = 0x10;
+    private const uint NIIF_INFO = 1;
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct NOTIFYICONDATA
@@ -94,7 +95,29 @@ internal sealed class TrayIcon : IDisposable
         if (!_added) Logger.Log("tray icon add FAILED");
     }
 
-    /// <summary>逐像素画一枚 32x32 图标：一道弧形绳 + 一只木夹。</summary>
+    public void SetTip(string tooltip)
+    {
+        if (!_added) return;
+        _nid.szTip = tooltip.Length > 127 ? tooltip.Substring(0, 127) : tooltip;
+        _nid.uFlags = NIF_TIP;
+        Shell_NotifyIcon(NIM_MODIFY, ref _nid);
+        _nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+    }
+
+    public void ShowBalloon(string title, string text)
+    {
+        if (!_added) return;
+        _nid.uFlags = NIF_INFO;
+        _nid.szInfoTitle = title.Length > 63 ? title.Substring(0, 63) : title;
+        _nid.szInfo = text.Length > 255 ? text.Substring(0, 255) : text;
+        _nid.dwInfoFlags = NIIF_INFO;
+        Shell_NotifyIcon(NIM_MODIFY, ref _nid);
+        _nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+        _nid.szInfo = "";
+        _nid.szInfoTitle = "";
+    }
+
+    /// <summary>逐像素画一枚 32x32 图标：一道细灰弧 + 一只铝质圆头夹。两端少画一截，看起来淡出。</summary>
     private static IntPtr CreatePegHIcon()
     {
         try
@@ -109,19 +132,31 @@ internal sealed class TrayIcon : IDisposable
                 px[i] = b; px[i + 1] = g; px[i + 2] = r; px[i + 3] = 255;
             }
 
-            for (int x = 1; x <= 30; x++)
+            for (int x = 2; x <= 29; x++)
             {
-                int y = 21 + (int)Math.Round(3.0 * Math.Sin(Math.PI * (x - 1) / 29.0));
-                Dot(x, y, 79, 106, 138);      // 绳：#8A6A4F (BGRA)
-                Dot(x, y + 1, 79, 106, 138);
+                int y = 20 + (int)Math.Round(4.0 * Math.Sin(Math.PI * (x - 2) / 27.0));
+                bool fade = x < 5 || x > 26;
+                if (fade) Dot(x, y, 196, 201, 206);          // 两端变淡
+                else
+                {
+                    Dot(x, y - 1, 232, 236, 240);            // 高光
+                    Dot(x, y, 184, 176, 167);                // 绳芯 #A7B0B8 (BGRA)
+                }
             }
-            for (int y = 9; y <= 22; y++)
+            for (int y = 6; y <= 23; y++)
             {
                 for (int x = 14; x <= 18; x++)
                 {
-                    bool edge = x == 14 || x == 18 || y == 9 || y == 22;
-                    if (edge) Dot(x, y, 40, 90, 138);       // 夹子描边
-                    else Dot(x, y, 78, 143, 201);           // 夹子木色 #C98F4E
+                    bool corner = (y <= 7 || y >= 22) && (x == 14 || x == 18);
+                    if (corner) continue;
+                    if (y >= 9 && y <= 10 && x >= 15 && x <= 17)
+                        Dot(x, y, 108, 101, 92);             // 绳槽 #5C656C
+                    else if (x == 14 || x == 18 || y == 6 || y == 23)
+                        Dot(x, y, 143, 136, 126);            // 铝边
+                    else if (x == 15)
+                        Dot(x, y, 248, 246, 243);            // 拉丝高光
+                    else
+                        Dot(x, y, 214, 206, 197);            // 铝身 #C5CED6
                 }
             }
 
